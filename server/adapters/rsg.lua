@@ -9,6 +9,19 @@ function RSG.GetPlayer(source)
     return RSG.GetCore().Functions.GetPlayer(source)
 end
 
+function RSG.NormalizePlayer(player)
+    if not player then return nil end
+    return {
+        PlayerData = player.PlayerData or {},
+        Functions = {
+            GetMoney = function(account) return player.Functions.GetMoney(account or 'cash') end,
+            AddMoney = function(account, amount, reason) return player.Functions.AddMoney(account or 'cash', amount, reason or 'cb-libs') end,
+            RemoveMoney = function(account, amount, reason) return player.Functions.RemoveMoney(account or 'cash', amount, reason or 'cb-libs') end,
+        },
+        raw = player,
+    }
+end
+
 function RSG.GetIdentifier(source)
     local player = RSG.GetPlayer(source)
     return player and player.PlayerData.citizenid or nil

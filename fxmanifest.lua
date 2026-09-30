@@ -6,43 +6,28 @@ lua54 'yes'
 name 'cb-libs'
 author 'Codebyte Studios'
 description 'Shared framework adapter and compatibility API for Codebyte RedM resources'
-version '0.2.0'
+version '0.3.0'
+
+escrow_ignore {
+    'shared/config.lua',
+    'server/custom.lua',
+}
 
 shared_scripts {
-    'shared/config.lua',
-    'shared/api.lua',
-    'init.lua',
+    'shared/*.lua',
+    'bridge/*.lua',
 }
 
 server_scripts {
-    'server/adapters/rsg.lua',
-    'server/adapters/qbr.lua',
-    'server/adapters/vorp.lua',
-    'server/adapters/redem.lua',
-    'server/adapters/gum.lua',
-    'server/adapters/custom.lua',
-    'server/main.lua',
+    'server/**/*.lua',
 }
 
 client_scripts {
-    'client/main.lua',
+    'client/*.lua',
 }
 
-exports {
-    'GetFramework',
-    'GetDetectedFrameworks',
-    'Notify',
-    'Progress',
-}
-
-server_exports {
-    'GetFramework',
-    'GetDetectedFrameworks',
-    'GetPlayer',
-    'GetIdentifier',
-    'GetJob',
-    'GetMoney',
-    'AddMoney',
-    'RemoveMoney',
-    'HasPermission',
+-- Public import file for dependent resources:
+-- shared_script '@cb-libs/imports/init.lua'
+files {
+    'imports/init.lua',
 }
