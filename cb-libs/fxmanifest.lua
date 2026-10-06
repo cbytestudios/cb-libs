@@ -6,7 +6,7 @@ lua54 'yes'
 name 'cb-libs'
 author 'Codebyte Studios'
 description 'Shared framework adapter and compatibility API for Codebyte RedM resources'
-version '0.3.2'
+version '1.0.0'
 
 escrow_ignore {
     'shared/config.lua',
@@ -26,11 +26,9 @@ server_scripts {
 }
 
 client_scripts {
+    'client/interactions.lua',
     'client/main.lua',
 }
-
--- Public import file for dependent resources:
--- shared_script '@cb-libs/imports/init.lua'
 files {
     'imports/init.lua',
 }
@@ -39,4 +37,3 @@ escrow_ignore {
     'shared/config.lua',
     'server/custom.lua',
 }
-

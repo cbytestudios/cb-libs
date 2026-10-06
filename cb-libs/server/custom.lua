@@ -126,7 +126,7 @@ end
 
 CBLibsCustomConfig.inventory.RegisterUsableItem = function(item, callback)
     return Inventory:RegisterUsableItem(item, function(source, itemData)
-        callback(source, itemData)
+        callback(source, itemData and itemData.name or item, itemData)
     end)
 end
 

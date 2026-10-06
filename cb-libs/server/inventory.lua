@@ -104,28 +104,38 @@ function Inventory.RegisterUsableItem(provider, item, callback)
     if provider == 'custom' then return custom('RegisterUsableItem', item, callback) end
     if provider == 'tpz' then
         return tpzInventory().registerUsableItem(item, GetCurrentResourceName(), function(data)
-            callback(data.source, data)
+            callback(data.source, data.name or item, data)
         end)
     end
     local resource = Inventory.GetResource(provider)
     if provider == 'vorp' then
         return exports[resource]:registerUsableItem(item, function(data)
-            return callback(data.source, data.item)
+            local name = type(data.item) == 'table' and data.item.name or item
+            return callback(data.source, name, data)
         end)
     end
     if isQBStyle(provider) then
         local coreResource = 'rsg-core'
         local core = exports[coreResource]:GetCoreObject()
-        return core.Functions.CreateUseableItem(item, function(source, itemData) callback(source, itemData) end)
+        return core.Functions.CreateUseableItem(item, function(source, itemData)
+            callback(source, itemData and itemData.name or item, itemData)
+        end)
     end
 end
 
 function Inventory.OpenStash(provider, source, id, options)
     if provider == 'custom' then return custom('OpenStash', source, id, options or {}) end
-    -- TPZ exposes container read/write APIs but no supported create/open-stash API.
-    -- A server can add that UI flow through server/custom.lua.
-    if provider == 'tpz' then return custom('OpenStash', source, id, options or {}) end
     local resource, cfg = Inventory.GetResource(provider), options or {}
+    if provider == 'tpz' then
+        TriggerEvent('tpz_inventory:registerContainerInventory', id, cfg.weight or 100.0, true, {}, {
+            label = cfg.label or id,
+        })
+        -- TPZ creates new persistent containers asynchronously before exposing
+        -- them to its client-side open-by-name API.
+        Wait(1750)
+        TriggerClientEvent('cb-libs:client:openTpzContainer', source, id, cfg.label or id)
+        return true
+    end
     if provider == 'vorp' then return exports[resource]:openInventory(source, id) end
     if isQBStyle(provider) then
         local data = { label = cfg.label, maxweight = cfg.weight, slots = cfg.slots }

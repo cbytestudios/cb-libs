@@ -3,13 +3,9 @@
   "headline": "CB Libs Has Been Updated!",
   "description": "A new update is now available for CB Libs.",
   "changes": [
-    "Framework, inventory, and notifications now default to auto.",
-    "Automatic notifications now use the detected framework's native notification API.",
-    "Corrected RSG inventory argument ordering and item lookup for the current API.",
-    "Replaced the removed VORP IsAdmin call with ACE and group permission checks.",
-    "Corrected VORP money functions so they return success properly.",
-    "Made the manifest load order deterministic so adapters load before the main bridge.",
-    "Custom framework and inventory handlers are now enabled by selecting custom in the shared config, with no separate enabled setting."
+   "Framework-independent interaction exports",
+   "Normalized usable-item callbacks",
+"TPZ persistent container/stash opening"
   ],
   "mention": "<@&1481373931360485406>",
   "product_url": "https://codebytestudios.tebex.store/package/cb-libs",

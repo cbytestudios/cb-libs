@@ -85,6 +85,10 @@ With `notifications = 'auto'`, that call uses the notification API belonging to
 the automatically detected framework. Optional `bln` and `ox_lib` overrides
 remain available for servers that explicitly want them.
 
+Target interactions are automatic too. CB Libs uses `ox_target` when it is
+running and otherwise supplies a built-in RedM proximity interaction fallback.
+Individual Codebyte scripts do not need a target setting.
+
 ## Custom frameworks and inventories
 
 For an unsupported framework, set `framework = 'custom'` in

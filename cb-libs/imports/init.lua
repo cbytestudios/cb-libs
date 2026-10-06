@@ -41,4 +41,10 @@ else
     function CBLibs.GetKeybind(name) return exports['cb-libs']:GetKeybind(name) end
     function CBLibs.CreatePrompt(id, coords, control, label, options) return exports['cb-libs']:CreatePrompt(id, coords, control, label, options) end
     function CBLibs.DeletePrompt(handle) return exports['cb-libs']:DeletePrompt(handle) end
+    function CBLibs.GetInteractionProvider() return exports['cb-libs']:GetInteractionProvider() end
+    function CBLibs.GetInteractionKeys() return exports['cb-libs']:GetInteractionKeys() end
+    function CBLibs.AddPointInteraction(id, data) return exports['cb-libs']:AddPointInteraction(id, data) end
+    function CBLibs.AddEntityInteraction(id, entity, options) return exports['cb-libs']:AddEntityInteraction(id, entity, options) end
+    function CBLibs.RemoveInteraction(id) return exports['cb-libs']:RemoveInteraction(id) end
+    function CBLibs.HasInteraction(id) return exports['cb-libs']:HasInteraction(id) end
 end

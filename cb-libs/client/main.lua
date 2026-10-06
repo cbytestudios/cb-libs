@@ -191,6 +191,11 @@ exports('GetKeybind', keybind)
 exports('CreatePrompt', createPrompt)
 exports('DeletePrompt', deletePrompt)
 
+RegisterNetEvent('cb-libs:client:openTpzContainer', function(id, label)
+    if GetResourceState('tpz_inventory') ~= 'started' then return end
+    exports.tpz_inventory:getInventoryAPI().openInventoryContainerByName(id, label or id, false, false)
+end)
+
 RegisterNetEvent('cb-libs:client:playerData', function(data)
     cachedPlayerData = data
     TriggerEvent('cb-libs:client:playerDataUpdated', data)
