@@ -1,0 +1,209 @@
+name: Create CFX Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -------------------------------------------------------
+      # Find version from fxmanifest.lua
+      # -------------------------------------------------------
+      - name: Find resource version
+        id: version
+        shell: bash
+        run: |
+          MANIFEST=$(find . -name "fxmanifest.lua" -not -path "./.git/*" | head -n 1)
+
+          if [ -z "$MANIFEST" ]; then
+            echo "ERROR: No fxmanifest.lua found."
+            exit 1
+          fi
+
+          VERSION=$(grep -E "^[[:space:]]*version[[:space:]]+['\"]" "$MANIFEST" \
+            | head -n 1 \
+            | sed -E "s/.*version[[:space:]]+['\"]([^'\"]+)['\"].*/\1/")
+
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: No version found in $MANIFEST"
+            exit 1
+          fi
+
+          echo "Found manifest: $MANIFEST"
+          echo "Found version: $VERSION"
+          echo "Release tag: v$VERSION"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      # -------------------------------------------------------
+      # Prevent duplicate releases / Discord announcements
+      # -------------------------------------------------------
+      - name: Check for existing release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Release $TAG does not exist."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # -------------------------------------------------------
+      # Create GitHub release
+      # -------------------------------------------------------
+      - name: Create GitHub release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          gh release create "$TAG" \
+            --target "${{ github.sha }}" \
+            --title "${{ github.event.repository.name }} $TAG" \
+            --generate-notes
+
+      # -------------------------------------------------------
+      # Send custom Discord update
+      # Only runs when a NEW release was created
+      # -------------------------------------------------------
+      - name: Send Discord update
+        if: steps.check.outputs.exists == 'false'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "DISCORD_WEBHOOK_URL secret is not configured."
+            exit 1
+          fi
+
+          if [ ! -f "update.json" ]; then
+            echo "No update.json found. Skipping Discord announcement."
+            exit 0
+          fi
+
+          ENABLED=$(jq -r '.enabled // true' update.json)
+
+          if [ "$ENABLED" != "true" ]; then
+            echo "Discord announcement disabled in update.json."
+            exit 0
+          fi
+
+          TITLE=$(jq -r '.title // "Codebyte Studios Update"' update.json)
+          HEADLINE=$(jq -r '.headline // empty' update.json)
+          DESCRIPTION=$(jq -r '.description // "A new update is now available."' update.json)
+          MENTION=$(jq -r '.mention // empty' update.json)
+          PRODUCT_URL=$(jq -r '.product_url // empty' update.json)
+          THUMBNAIL_URL=$(jq -r '.thumbnail_url // empty' update.json)
+          FOOTER=$(jq -r '.footer // "Codebyte Studios - Quality Roleplay Development"' update.json)
+
+          RELEASE_URL="https://github.com/${REPOSITORY}/releases/tag/${TAG}"
+
+          if [ -z "$PRODUCT_URL" ]; then
+            PRODUCT_URL="$RELEASE_URL"
+          fi
+
+          if [ -z "$HEADLINE" ]; then
+            HEADLINE="$TITLE Has Been Updated!"
+          fi
+
+          CHANGES=$(jq -r '
+            (.changes // [])
+            | map("• " + .)
+            | join("\n")
+          ' update.json)
+
+          if [ -z "$CHANGES" ]; then
+            CHANGES="• General improvements and fixes"
+          fi
+
+          jq -n \
+            --arg content "$MENTION" \
+            --arg title "$HEADLINE" \
+            --arg description "$DESCRIPTION" \
+            --arg changes "$CHANGES" \
+            --arg resource "$TITLE" \
+            --arg version "$VERSION" \
+            --arg url "$PRODUCT_URL" \
+            --arg thumbnail "$THUMBNAIL_URL" \
+            --arg footer "$FOOTER" \
+            '{
+              username: "Codebyte Studios",
+              content: $content,
+              allowed_mentions: {
+                parse: ["roles", "users"]
+              },
+              embeds: [
+                (
+                  {
+                    title: $title,
+                    url: $url,
+                    description: (
+                      $description
+                      + "\n\n"
+                      + $changes
+                      + "\n\n"
+                      + "📄 **"
+                      + $resource
+                      + " - "
+                      + $version
+                      + "**"
+                    ),
+                    color: 16753920,
+                    footer: {
+                      text: $footer
+                    }
+                  }
+                  +
+                  if $thumbnail != "" then
+                    {
+                      thumbnail: {
+                        url: $thumbnail
+                      }
+                    }
+                  else
+                    {}
+                  end
+                )
+              ]
+            }' > discord_payload.json
+
+          echo "Sending Discord announcement for $TITLE v$VERSION..."
+
+          HTTP_STATUS=$(curl \
+            --silent \
+            --show-error \
+            --output discord_response.txt \
+            --write-out "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d @discord_payload.json \
+            "$DISCORD_WEBHOOK_URL")
+
+          if [ "$HTTP_STATUS" != "204" ] && [ "$HTTP_STATUS" != "200" ]; then
+            echo "Discord webhook failed with HTTP $HTTP_STATUS"
+            cat discord_response.txt
+            exit 1
+          fi
+
+          echo "Discord announcement sent successfully."

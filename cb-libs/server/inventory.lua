@@ -52,8 +52,7 @@ function Inventory.GetItem(provider, source, item, metadata)
     local resource = Inventory.GetResource(provider)
     if provider == 'vorp' then return exports[resource]:getItem(source, item, metadata) end
     if isQBStyle(provider) then
-        local stacks = exports[resource]:GetItemsByName(source, item)
-        return type(stacks) == 'table' and next(stacks) and stacks[next(stacks)] or nil
+        return exports[resource]:GetItemByName(source, item)
     end
 end
 
@@ -84,7 +83,7 @@ function Inventory.AddItem(provider, source, item, amount, metadata, reason)
     end
     local resource = Inventory.GetResource(provider)
     if provider == 'vorp' then return exports[resource]:addItem(source, item, amount, metadata) and true or false end
-    if isQBStyle(provider) then return exports[resource]:AddItem(source, item, amount, false, metadata, reason or 'cb-libs') and true or false end
+    if isQBStyle(provider) then return exports[resource]:AddItem(source, item, amount, metadata, nil, reason or 'cb-libs') and true or false end
     return false
 end
 
@@ -97,7 +96,7 @@ function Inventory.RemoveItem(provider, source, item, amount, metadata, reason)
     end
     local resource = Inventory.GetResource(provider)
     if provider == 'vorp' then return exports[resource]:subItem(source, item, amount, metadata) and true or false end
-    if isQBStyle(provider) then return exports[resource]:RemoveItem(source, item, amount, false, reason or 'cb-libs') and true or false end
+    if isQBStyle(provider) then return exports[resource]:RemoveItem(source, item, amount, nil, reason or 'cb-libs') and true or false end
     return false
 end
 

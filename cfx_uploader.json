@@ -1,0 +1,5 @@
+{
+  "portalName": "cb-wilderness",
+  "foldersToZip": ["cb-wilderness"],
+  "deleteOldestVersionWhenCapped": true
+}

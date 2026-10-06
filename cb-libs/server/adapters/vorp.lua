@@ -30,8 +30,14 @@ function VORP.NormalizePlayer(character)
             GetMoney = function(account)
                 return account == 'gold' and data.money.gold or account == 'rol' and data.money.rol or data.money.cash
             end,
-            AddMoney = function(account, amount) return character.addCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount) end,
-            RemoveMoney = function(account, amount) return character.removeCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount) end,
+            AddMoney = function(account, amount)
+                character.addCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount)
+                return true
+            end,
+            RemoveMoney = function(account, amount)
+                character.removeCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount)
+                return true
+            end,
         },
         raw = character,
     }
@@ -53,10 +59,25 @@ function VORP.GetMoney(source, account)
 end
 function VORP.AddMoney(source, account, amount)
     local character = VORP.GetPlayer(source)
-    return character and character.addCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount) or false
+    if not character then return false end
+    character.addCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount)
+    return true
 end
 function VORP.RemoveMoney(source, account, amount)
     local character = VORP.GetPlayer(source)
-    return character and character.removeCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount) or false
+    if not character then return false end
+    character.removeCurrency(account == 'gold' and 1 or account == 'rol' and 2 or 0, amount)
+    return true
 end
-function VORP.HasPermission(source, permission) return VORP.GetCore().IsAdmin(source, permission) end
+function VORP.HasPermission(source, permission)
+    if IsPlayerAceAllowed(source, permission) then return true end
+    local user = VORP.GetUser(source)
+    local group = user and user.getGroup
+    if type(permission) == 'table' then
+        for _, allowed in pairs(permission) do
+            if group == allowed then return true end
+        end
+        return false
+    end
+    return group == permission
+end

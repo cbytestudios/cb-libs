@@ -6,7 +6,7 @@ local adapters = {
 }
 
 local detected = CBLibsProviders.Detect('framework')
-local framework = CBLibsConfig.framework ~= 'auto' and CBLibsConfig.framework or detected[1] or (CBLibsCustomConfig.enabled and 'custom' or nil)
+local framework = CBLibsConfig.framework ~= 'auto' and CBLibsConfig.framework or detected[1]
 local adapter = framework and adapters[framework] or nil
 
 if not adapter then
@@ -30,7 +30,7 @@ local function getPlayer(source)
 end
 
 local detectedInventory = CBLibsProviders.Detect('inventory')
-local inventoryProvider = CBLibsConfig.inventory ~= 'auto' and CBLibsConfig.inventory or detectedInventory[1] or (CBLibsCustomConfig.enabled and 'custom' or nil)
+local inventoryProvider = CBLibsConfig.inventory ~= 'auto' and CBLibsConfig.inventory or detectedInventory[1]
 
 if not inventoryProvider then
     print('[cb-libs] No inventory loaded. Inventory exports will return nil/false.')

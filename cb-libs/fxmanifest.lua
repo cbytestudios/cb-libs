@@ -14,16 +14,19 @@ escrow_ignore {
 }
 
 shared_scripts {
-    'shared/*.lua',
-    'bridge/*.lua',
+    'shared/config.lua',
+    'bridge/providers.lua',
 }
 
 server_scripts {
-    'server/**/*.lua',
+    'server/custom.lua',
+    'server/adapters/*.lua',
+    'server/inventory.lua',
+    'server/main.lua',
 }
 
 client_scripts {
-    'client/*.lua',
+    'client/main.lua',
 }
 
 -- Public import file for dependent resources:
@@ -31,3 +34,9 @@ client_scripts {
 files {
     'imports/init.lua',
 }
+
+escrow_ignore {
+    'shared/config.lua',
+    'server/custom.lua',
+}
+

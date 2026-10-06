@@ -55,7 +55,9 @@ local function notify(data)
     data = data or {}
     local provider = CBLibsConfig.notifications
     if provider == 'auto' then
-        provider = GetResourceState('bln_notify') == 'started' and 'bln' or GetResourceState('ox_lib') == 'started' and 'ox_lib' or framework
+        provider = framework
+            or (GetResourceState('bln_notify') == 'started' and 'bln')
+            or (GetResourceState('ox_lib') == 'started' and 'ox_lib')
     end
 
     if provider == 'bln' and GetResourceState('bln_notify') == 'started' then
@@ -87,7 +89,8 @@ local function notify(data)
     end
 
     if provider == 'rsg' and GetResourceState('rsg-core') == 'started' then
-        TriggerEvent('RSGCore:Notify', data.description or data.text or '', data.type or 'primary', data.duration)
+        local core = exports['rsg-core']:GetCoreObject()
+        core.Functions.Notify(data)
         return true
     end
 
@@ -96,8 +99,8 @@ local function notify(data)
         return true
     end
 
-    if provider == 'vorp' then
-        TriggerEvent('vorp:TipRight', data.description or data.text or '', data.duration or 4000)
+    if provider == 'vorp' and GetResourceState('vorp_core') == 'started' then
+        exports.vorp_core:GetCore().NotifyRightTip(data.description or data.text or '', data.duration or 4000)
         return true
     end
 
