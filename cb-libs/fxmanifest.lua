@@ -6,7 +6,7 @@ lua54 'yes'
 name 'cb-libs'
 author 'Codebyte Studios'
 description 'Shared framework adapter and compatibility API for Codebyte RedM resources'
-version '0.3.1'
+version '0.3.2'
 
 escrow_ignore {
     'shared/config.lua',
