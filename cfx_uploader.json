@@ -1,5 +1,5 @@
 {
-  "portalName": "cb-wilderness",
-  "foldersToZip": ["cb-wilderness"],
+  "portalName": "cb-libs",
+  "foldersToZip": ["cb-libs"],
   "deleteOldestVersionWhenCapped": true
 }
