@@ -31,19 +31,6 @@ local function getPlayerData()
         end
     end
 
-    if framework == 'tpz' and GetResourceState('tpz_core') == 'started' then
-        local ok, character = pcall(function()
-            return exports.tpz_core:getCoreAPI().GetPlayerClientData()
-        end)
-        if ok and character then
-            return {
-                citizenid = character.charIdentifier or character.identifier,
-                charinfo = { firstname = character.firstname or '', lastname = character.lastname or '', birthdate = character.dob, gender = character.gender },
-                job = { name = character.job or 'unemployed', label = character.job or 'Unemployed', grade = { level = tonumber(character.jobGrade) or 0 }, onduty = true },
-                money = { cash = tonumber(character.money) or 0, gold = tonumber(character.gold) or 0, blackmoney = tonumber(character.blackmoney) or 0 },
-            }
-        end
-    end
     return cachedPlayerData
 end
 
@@ -91,11 +78,6 @@ local function notify(data)
     if provider == 'rsg' and GetResourceState('rsg-core') == 'started' then
         local core = exports['rsg-core']:GetCoreObject()
         core.Functions.Notify(data)
-        return true
-    end
-
-    if provider == 'tpz' and GetResourceState('tpz_core') == 'started' then
-        exports.tpz_core:getCoreAPI().NotifyTip(data.description or data.text or '', data.duration or 4000)
         return true
     end
 
@@ -191,11 +173,6 @@ exports('GetKeybind', keybind)
 exports('CreatePrompt', createPrompt)
 exports('DeletePrompt', deletePrompt)
 
-RegisterNetEvent('cb-libs:client:openTpzContainer', function(id, label)
-    if GetResourceState('tpz_inventory') ~= 'started' then return end
-    exports.tpz_inventory:getInventoryAPI().openInventoryContainerByName(id, label or id, false, false)
-end)
-
 RegisterNetEvent('cb-libs:client:playerData', function(data)
     cachedPlayerData = data
     TriggerEvent('cb-libs:client:playerDataUpdated', data)
@@ -214,13 +191,6 @@ if framework == 'rsg' then
     end)
     RegisterNetEvent('RSGCore:Player:SetPlayerData', function(data)
         TriggerEvent('cb-libs:client:playerDataUpdated', data)
-    end)
-elseif framework == 'tpz' then
-    RegisterNetEvent('tpz_core:isPlayerReady', function()
-        TriggerEvent('cb-libs:client:playerLoaded', getPlayerData())
-    end)
-    RegisterNetEvent('tpz_core:getPlayerJob', function()
-        TriggerEvent('cb-libs:client:playerDataUpdated', getPlayerData())
     end)
 elseif framework == 'vorp' then
     RegisterNetEvent('vorp:SelectedCharacter', function()

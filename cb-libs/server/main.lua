@@ -1,13 +1,12 @@
 local adapters = {
     rsg = CBLibsRSG,
     vorp = CBLibsVORP,
-    tpz = CBLibsTPZ,
-    custom = CBLibsCustom,
 }
 
 local detected = CBLibsProviders.Detect('framework')
 local framework = CBLibsConfig.framework ~= 'auto' and CBLibsConfig.framework or detected[1]
 local adapter = framework and adapters[framework] or nil
+local prisonAdapter
 
 if not adapter then
     print(('[cb-libs] No framework loaded. Check shared/config.lua.'):format(tostring(framework or 'none')))
@@ -81,6 +80,24 @@ exports('CanAfford', function(source, amount, account, remove, reason)
     if (tonumber(call('GetMoney', source, account)) or 0) < amount then return false end
     if not remove then return true end
     return call('RemoveMoney', source, account, amount, reason or 'cb-libs') and true or false
+end)
+exports('RegisterPrisonAdapter', function(callback)
+    if type(callback) ~= 'function' then return false end
+    prisonAdapter = callback
+    return true
+end)
+exports('JailPlayer', function(officer, target, minutes, reason)
+    minutes = math.max(0, math.floor(tonumber(minutes) or 0))
+    if minutes < 1 then return false, 'A valid jail sentence is required.' end
+    if prisonAdapter then return prisonAdapter(officer, target, minutes, reason) end
+    if framework == 'rsg' and GetResourceState('rsg-prison') == 'started' then
+        local player = CBLibsRSG.GetPlayer(target)
+        if not player then return false, 'The citizen is not available.' end
+        player.Functions.SetMetaData('injail', minutes)
+        TriggerClientEvent('rsg-prison:client:Enter', target, minutes)
+        return true
+    end
+    return false, ('No prison adapter is registered for %s.'):format(framework or 'this framework')
 end)
 
 RegisterNetEvent('cb-libs:server:requestPlayerData', function()

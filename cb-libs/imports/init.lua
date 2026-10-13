@@ -34,6 +34,8 @@ if IsDuplicityVersion() then
     function CBLibs.RegisterUsableItem(item, callback) return exports['cb-libs']:RegisterUsableItem(item, callback) end
     function CBLibs.OpenStash(source, id, options) return exports['cb-libs']:OpenStash(source, id, options) end
     function CBLibs.CanUseItem(source, item, amount, metadata, remove, reason) return exports['cb-libs']:CanUseItem(source, item, amount, metadata, remove, reason) end
+    function CBLibs.RegisterPrisonAdapter(callback) return exports['cb-libs']:RegisterPrisonAdapter(callback) end
+    function CBLibs.JailPlayer(officer, target, minutes, reason) return exports['cb-libs']:JailPlayer(officer, target, minutes, reason) end
 else
     function CBLibs.GetPlayerData() return exports['cb-libs']:GetPlayerData() end
     function CBLibs.Notify(data) return exports['cb-libs']:Notify(data) end
@@ -45,6 +47,7 @@ else
     function CBLibs.GetInteractionKeys() return exports['cb-libs']:GetInteractionKeys() end
     function CBLibs.AddPointInteraction(id, data) return exports['cb-libs']:AddPointInteraction(id, data) end
     function CBLibs.AddEntityInteraction(id, entity, options) return exports['cb-libs']:AddEntityInteraction(id, entity, options) end
+    function CBLibs.AddGlobalPedInteraction(id, options) return exports['cb-libs']:AddGlobalPedInteraction(id, options) end
     function CBLibs.RemoveInteraction(id) return exports['cb-libs']:RemoveInteraction(id) end
     function CBLibs.HasInteraction(id) return exports['cb-libs']:HasInteraction(id) end
 end

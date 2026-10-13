@@ -1,13 +1,11 @@
 CBLibsConfig = {
-    -- Use 'auto' for RSG, VORP, or TPZ. Use 'custom' to enable the framework
-    -- handlers in server/custom.lua.
+    -- Use 'auto', 'rsg', or 'vorp'.
     framework = 'auto',
 
-    -- Inventories are detected independently. Use 'custom' to enable the
-    -- inventory handlers in server/custom.lua.
+    -- Inventories are detected independently: 'auto', 'rsg', or 'vorp'.
     inventory = 'auto',
 
     -- Auto uses the detected framework's notification system.
-    -- Manual overrides: bln, ox_lib, rsg, vorp, tpz, or none.
+    -- Manual overrides: bln, ox_lib, rsg, vorp, or none.
     notifications = 'auto',
 }

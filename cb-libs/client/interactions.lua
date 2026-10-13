@@ -49,8 +49,10 @@ local function remove(key)
     if handle and GetResourceState('ox_target') == 'started' then
         if handle.kind == 'point' then
             exports.ox_target:removeZone(handle.zone)
-        else
+        elseif handle.kind == 'entity' then
             exports.ox_target:removeLocalEntity(handle.entity, handle.names)
+        elseif handle.kind == 'globalPed' then
+            exports.ox_target:removeGlobalPed(handle.names)
         end
     end
     oxHandles[key], entries[key] = nil, nil
@@ -95,6 +97,20 @@ exports('AddEntityInteraction', function(id, entity, options)
     return true
 end)
 
+exports('AddGlobalPedInteraction', function(id, options)
+    local key = ownerKey(id)
+    remove(key)
+    if provider() == 'ox_target' then
+        local converted, names = toOx(key, id, options), {}
+        for index, option in ipairs(converted) do names[index] = option.name end
+        exports.ox_target:addGlobalPed(converted)
+        oxHandles[key] = { kind = 'globalPed', names = names }
+    else
+        entries[key] = { id = id, kind = 'globalPed', options = options or {} }
+    end
+    return true
+end)
+
 local function visibleOptions(entry, entity, distance)
     local visible = {}
     for _, option in ipairs(entry.options) do
@@ -116,8 +132,22 @@ CreateThread(function()
                     local coords, entity
                     if entry.kind == 'point' then
                         coords = entry.coords
-                    elseif DoesEntityExist(entry.entity) then
+                    elseif entry.kind == 'entity' and DoesEntityExist(entry.entity) then
                         entity, coords = entry.entity, GetEntityCoords(entry.entity)
+                    elseif entry.kind == 'globalPed' then
+                        for _, ped in ipairs(GetGamePool('CPed')) do
+                            if DoesEntityExist(ped) and not IsPedAPlayer(ped) then
+                                local pedCoords = GetEntityCoords(ped)
+                                local pedDistance = #(playerCoords - pedCoords)
+                                if pedDistance <= defaultDistance and (not bestDistance or pedDistance < bestDistance) then
+                                    local options = visibleOptions(entry, ped, pedDistance)
+                                    if #options > 0 then
+                                        bestDistance = pedDistance
+                                        current = { id = entry.id, entity = ped, coords = pedCoords, options = options }
+                                    end
+                                end
+                            end
+                        end
                     end
                     if coords then
                         local distance = #(playerCoords - coords)

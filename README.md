@@ -1,7 +1,7 @@
 # CB Libs
 
 CB Libs is the shared compatibility API used by Codebyte RedM resources. It
-supports RSG, VORP, and TPZ without requiring customers to select a framework or
+supports RSG and VORP without requiring customers to select a framework or
 inventory in the config.
 
 ## Automatic detection
@@ -13,11 +13,10 @@ notifications. CB Libs detects these official resource names at startup:
 | --- | --- | --- | --- |
 | RSG | `rsg-core` | `rsg-inventory` | RSG Core |
 | VORP | `vorp_core` | `vorp_inventory` | VORP Core |
-| TPZ | `tpz_core` | `tpz_inventory` | TPZ Core |
 
 No config edit is needed for these combinations. When more than one supported
 provider is running, CB Libs logs what it found and uses the built-in priority:
-RSG, then VORP, then TPZ.
+RSG, then VORP.
 
 ## Install
 
@@ -39,14 +38,6 @@ VORP example:
 ```cfg
 ensure vorp_core
 ensure vorp_inventory
-ensure cb-libs
-```
-
-TPZ example:
-
-```cfg
-ensure tpz_core
-ensure tpz_inventory
 ensure cb-libs
 ```
 
@@ -81,6 +72,16 @@ CBLibs.Notify({
 })
 ```
 
+Prison resources do not share a framework API. `rsg-prison` is supported by
+default. A VORP prison resource can register its server-side jail function once:
+
+```lua
+CBLibs.RegisterPrisonAdapter(function(officer, target, minutes, reason)
+    -- Call your VORP prison resource here.
+    return true
+end)
+```
+
 With `notifications = 'auto'`, that call uses the notification API belonging to
 the automatically detected framework. Optional `bln` and `ox_lib` overrides
 remain available for servers that explicitly want them.
@@ -89,12 +90,3 @@ Target interactions are automatic too. CB Libs uses `ox_target` when it is
 running and otherwise supplies a built-in RedM proximity interaction fallback.
 Individual Codebyte scripts do not need a target setting.
 
-## Custom frameworks and inventories
-
-For an unsupported framework, set `framework = 'custom'` in
-`shared/config.lua`. For an unsupported inventory, set `inventory = 'custom'`.
-These settings are independent, so a server can use a supported framework with
-a custom inventory or the reverse.
-
-Implement the corresponding handlers in `server/custom.lua`. Both files are
-included in `escrow_ignore`, and no separate `enabled` setting is required.

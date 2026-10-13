@@ -3,9 +3,12 @@
   "headline": "CB Libs Has Been Updated!",
   "description": "A new update is now available for CB Libs.",
   "changes": [
-   "Framework-independent interaction exports",
-   "Normalized usable-item callbacks",
-"TPZ persistent container/stash opening"
+    "Limited built-in framework and inventory support to RSG and VORP",
+    "Limited all framework detection, adapters, notifications, lifecycle handlers, and inventory code to RSG and VORP",
+    "Verified and corrected VORP item queries, capacity checks, item mutations, and usable-item registration",
+    "Added VORP custom-inventory registration before opening shared stashes",
+    "Added a generic prison handoff API with automatic rsg-prison support and an optional callback for any other prison resource",
+    "Kept framework-independent notifications, player data, money, inventory, prompts, and target interactions"
   ],
   "mention": "<@&1481373931360485406>",
   "product_url": "https://codebytestudios.tebex.store/package/cb-libs",

@@ -1,19 +1,17 @@
 -- Internal provider registry. Keep auto-detection details out of user config.
 CBLibsProviders = {
     framework = {
-        priority = { 'rsg', 'vorp', 'tpz' },
+        priority = { 'rsg', 'vorp' },
         resources = {
             rsg = { 'rsg-core' },
             vorp = { 'vorp_core' },
-            tpz = { 'tpz_core' },
         },
     },
     inventory = {
-        priority = { 'rsg', 'vorp', 'tpz' },
+        priority = { 'rsg', 'vorp' },
         resources = {
             rsg = { 'rsg-inventory' },
             vorp = { 'vorp_inventory' },
-            tpz = { 'tpz_inventory' },
         },
     },
 }
