@@ -1,18 +1,17 @@
 {
-  "title": "CB Libs",
-  "headline": "CB Libs Has Been Updated!",
-  "description": "A new update is now available for CB Libs.",
-  "changes": [
-    "Limited built-in framework and inventory support to RSG and VORP",
-    "Limited all framework detection, adapters, notifications, lifecycle handlers, and inventory code to RSG and VORP",
-    "Verified and corrected VORP item queries, capacity checks, item mutations, and usable-item registration",
-    "Added VORP custom-inventory registration before opening shared stashes",
-    "Added a generic prison handoff API with automatic rsg-prison support and an optional callback for any other prison resource",
-    "Kept framework-independent notifications, player data, money, inventory, prompts, and target interactions"
-  ],
-  "mention": "<@&1481373931360485406>",
-  "product_url": "https://codebytestudios.tebex.store/package/cb-libs",
-  "thumbnail_url": "https://r2.fivemanage.com/B5347h94aYDxVMc0FJFHa/cblogo.png",
-  "footer": "Codebyte Studios - Quality Roleplay Development",
-  "enabled": true
+    "title":  "CB Libs",
+    "headline":  "CB Libs v3.0.0",
+    "description":  "Major compatibility update; local release candidate pending framework validation.",
+    "changes":  [
+                    "Added RedEM:RP Reboot and TPZ Core provider detection and initial adapters; MULTIcore uses its built-in RSG compatibility aliases.",
+                    "Added resource-scoped callbacks and optional ox_lib UI with native context, text and progress fallbacks.",
+                    "Added trusted-resource framework and inventory registration contracts for custom integrations.",
+                    "Added generic native RedEM/TPZ storage routing and revision-pinned editable inventory patches, with server-owned access grants and metadata-preserving transfers. Install the matching patch to enable native storage.",
+                    "Added HasPrisonAdapter detection for native and custom prison integrations. Live testing remains required."
+                ],
+    "mention":  "\u003c@\u00261481373931360485406\u003e",
+    "product_url":  "https://codebytestudios.tebex.store/package/cb-libs",
+    "thumbnail_url":  "https://r2.fivemanage.com/B5347h94aYDxVMc0FJFHa/cblogo.png",
+    "footer":  "Codebyte Studios - Quality Roleplay Development",
+    "enabled":  true
 }

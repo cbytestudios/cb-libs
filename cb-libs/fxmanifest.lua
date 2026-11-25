@@ -6,7 +6,7 @@ lua54 'yes'
 name 'cb-libs'
 author 'Codebyte Studios'
 description 'Shared framework adapter and compatibility API for Codebyte RedM resources'
-version '1.1.1'
+version '3.0.0'
 
 shared_scripts {
     'shared/config.lua',
@@ -20,6 +20,7 @@ server_scripts {
 }
 
 client_scripts {
+    'imports/init.lua',
     'client/interactions.lua',
     'client/main.lua',
 }
@@ -29,4 +30,5 @@ files {
 
 escrow_ignore {
     'shared/config.lua',
+    'install/native-storage/*',
 }

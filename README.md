@@ -1,3 +1,15 @@
+# CB Libs v3.0.0 release candidate
+
+Start the installed framework and inventory before cb-libs. Start Codebyte products after cb-libs. RSG V2, RSG V3, VORP, RedEM:RP Reboot and TPZ Core are test targets; MULTIcore uses its built-in RSG compatibility exports, not a dedicated adapter. No mandatory ox_lib dependency is declared by Codebyte products. Follow the framework's own dependencies.
+
+Provider selection is automatic for known frameworks. Custom integrations use the versioned server-side registration contract in CUSTOM-FRAMEWORK.md. No escrowed file changes are needed.
+
+Release candidate limitations: live framework and gameplay tests remain outstanding. RedEM/TPZ native camp storage is available with the pinned upstream inventory compatibility patch (see install/native-storage/README.md in cb-libs). It retains native weapon IDs, unique item IDs and metadata. Unpatched servers retain the restricted managed fallback; withdraw fallback contents before switching. Live testing remains required. Do not publish as fully compatible before tests pass.
+
+---
+
+## Previous v1 documentation
+
 # CB Libs
 
 CB Libs is the shared compatibility API used by Codebyte RedM resources. It

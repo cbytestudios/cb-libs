@@ -2,7 +2,8 @@ CBLibsRSG = {}
 local RSG = CBLibsRSG
 
 function RSG.GetCore()
-    return exports['rsg-core']:GetCoreObject()
+    local resource = 'rsg-core'
+    return exports[resource]:GetCoreObject()
 end
 
 function RSG.GetPlayer(source)

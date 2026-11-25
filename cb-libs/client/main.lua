@@ -10,8 +10,8 @@ local function detectedFrameworks()
 end
 
 local function getPlayerData()
-    local coreResource = framework == 'rsg' and 'rsg-core'
-    if coreResource and GetResourceState(coreResource) == 'started' then
+    local coreResource = (framework == 'rsg' and 'rsg-core')
+    if coreResource and CBLibsProviders.IsStarted(coreResource) then
         local ok, data = pcall(function() return exports[coreResource]:GetCoreObject().Functions.GetPlayerData() end)
         if ok then return data end
     end
@@ -71,16 +71,21 @@ local function notify(data)
     end
 
     if provider == 'ox_lib' and GetResourceState('ox_lib') == 'started' then
+        CBLibs.GetRuntimeProvider()
+        if not lib then return false end
         lib.notify(data)
         return true
     end
 
-    if provider == 'rsg' and GetResourceState('rsg-core') == 'started' then
+
+    if provider == 'rsg' and CBLibsProviders.IsStarted('rsg-core') then
         local core = exports['rsg-core']:GetCoreObject()
         core.Functions.Notify(data)
         return true
     end
 
+    if provider == 'redem' then TriggerEvent('redem_roleplay:NotifyRight', data.description or data.text or '', data.duration or 4000); return true end
+    if provider == 'tpz' then TriggerEvent('tpz_core:sendTipNotification', data.description or data.text or '', data.duration or 4000); return true end
     if provider == 'vorp' and GetResourceState('vorp_core') == 'started' then
         exports.vorp_core:GetCore().NotifyRightTip(data.description or data.text or '', data.duration or 4000)
         return true
@@ -90,13 +95,12 @@ local function notify(data)
 end
 
 local function progress(data)
-    if GetResourceState('ox_lib') == 'started' then return lib.progressCircle(data) end
-    return false
+    return CBLibs.ProgressBar(data or {})
 end
 
 local function keybind(name)
-    local resource = framework == 'rsg' and 'rsg-core'
-    if not resource or GetResourceState(resource) ~= 'started' then return nil end
+    local resource = (framework == 'rsg' and 'rsg-core')
+    if not resource or not CBLibsProviders.IsStarted(resource) then return nil end
     local core = exports[resource]:GetCoreObject()
     return core.Shared and core.Shared.Keybinds and core.Shared.Keybinds[name] or nil
 end
@@ -129,25 +133,25 @@ local function ensureFallbackPromptThread()
                 end
             end
             if closest then
-                if GetResourceState('ox_lib') == 'started' then
-                    lib.showTextUI(('[%s] %s'):format(closest.key or 'E', closest.label))
+                if true then
+                    CBLibs.ShowTextUI(('[%s] %s'):format(closest.key or 'E', closest.label))
                     showing = true
                 end
                 if IsControlJustReleased(0, closest.control or 0xCEFD9220) then runPrompt(closest) end
                 Wait(0)
             else
-                if showing and GetResourceState('ox_lib') == 'started' then lib.hideTextUI() end
+                if showing then CBLibs.HideTextUI() end
                 showing = false
                 Wait(200)
             end
         end
-        if showing and GetResourceState('ox_lib') == 'started' then lib.hideTextUI() end
+        if showing then CBLibs.HideTextUI() end
         fallbackPromptThread = false
     end)
 end
 
 local function createPrompt(id, coords, control, label, options)
-    if framework == 'rsg' and GetResourceState('rsg-core') == 'started' then
+    if framework == 'rsg' and CBLibsProviders.IsStarted('rsg-core') then
         return exports['rsg-core']:createPrompt(id, coords, control, label, options)
     end
     local handle = ('cb-libs:%s'):format(id)
@@ -157,7 +161,7 @@ local function createPrompt(id, coords, control, label, options)
 end
 
 local function deletePrompt(handle)
-    if framework == 'rsg' and GetResourceState('rsg-core') == 'started' then
+    if framework == 'rsg' and CBLibsProviders.IsStarted('rsg-core') then
         return exports['rsg-core']:deletePrompt(handle)
     end
     fallbackPrompts[handle] = nil
@@ -173,10 +177,17 @@ exports('GetKeybind', keybind)
 exports('CreatePrompt', createPrompt)
 exports('DeletePrompt', deletePrompt)
 
+local pollLifecycle = framework == 'redem' or framework == 'tpz' or framework == 'custom'
 RegisterNetEvent('cb-libs:client:playerData', function(data)
+    if source ~= 65535 then return end
+    local previous = cachedPlayerData and cachedPlayerData.citizenid
+    local current = data and data.citizenid
     cachedPlayerData = data
     TriggerEvent('cb-libs:client:playerDataUpdated', data)
-    if framework == 'vorp' and data then
+    if pollLifecycle then
+        if previous and previous ~= current then TriggerEvent('cb-libs:client:playerUnloaded') end
+        if current and previous ~= current then TriggerEvent('cb-libs:client:playerLoaded', data) end
+    elseif framework == 'vorp' and data then
         TriggerEvent('cb-libs:client:playerLoaded', data)
     end
 end)
@@ -201,5 +212,5 @@ end
 
 CreateThread(function()
     Wait(1000)
-    requestPlayerData()
+    repeat requestPlayerData(); if pollLifecycle then Wait(5000) end until not pollLifecycle
 end)
