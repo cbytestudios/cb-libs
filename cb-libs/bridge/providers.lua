@@ -46,3 +46,22 @@ function CBLibsProviders.Resource(kind, name)
         if CBLibsProviders.IsStarted(resource) then return resource end
     end
 end
+
+function CBLibsProviders.Describe(kind, name)
+    if name ~= 'rsg' then return name end
+    if kind == 'framework' and GetResourceState('rsg-core') ~= 'started' and GetResourceState('MULTIcore') == 'started' then
+        return 'rsg via MULTIcore'
+    end
+    if kind == 'inventory' and GetResourceState('rsg-inventory') ~= 'started' and GetResourceState('MULTIinventory') == 'started' then
+        return 'rsg via MULTIinventory'
+    end
+    return name
+end
+
+function CBLibsProviders.DescribeAll(kind, names)
+    local described = {}
+    for index, name in ipairs(names) do
+        described[index] = CBLibsProviders.Describe(kind, name)
+    end
+    return described
+end

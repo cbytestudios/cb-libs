@@ -1,13 +1,13 @@
 {
     "title":  "CB Libs",
-    "headline":  "CB Libs v3.0.0",
-    "description":  "Major compatibility update; local release candidate pending framework validation.",
+    "headline":  "CB Libs v3.0.1",
+    "description":  "Framework compatibility, startup reporting and centralized update-check release.",
     "changes":  [
-                    "Added RedEM:RP Reboot and TPZ Core provider detection and initial adapters; MULTIcore uses its built-in RSG compatibility aliases.",
-                    "Added resource-scoped callbacks and optional ox_lib UI with native context, text and progress fallbacks.",
-                    "Added trusted-resource framework and inventory registration contracts for custom integrations.",
-                    "Added generic native RedEM/TPZ storage routing and revision-pinned editable inventory patches, with server-owned access grants and metadata-preserving transfers. Install the matching patch to enable native storage.",
-                    "Added HasPrisonAdapter detection for native and custom prison integrations. Live testing remains required."
+                    "Added shared versioned startup banners for every Codebyte resource.",
+                    "Added one cached public version-catalog request, update alerts and the cbversions console command.",
+                    "Improved provider messages to identify RSG compatibility supplied by MULTIcore and MULTIinventory.",
+                    "Added release workflows and a public version catalog for automatic version publishing.",
+                    "Removed obsolete Python test files while retaining the required native-storage installer."
                 ],
     "mention":  "\u003c@\u00261481373931360485406\u003e",
     "product_url":  "https://codebytestudios.tebex.store/package/cb-libs",

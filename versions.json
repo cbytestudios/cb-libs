@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "resources": {
+    "cb-bountyhunter": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/bountyhunter"
+    },
+    "cb-chat": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/chat"
+    },
+    "cb-lawarchives": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/lawarchives"
+    },
+    "cb-libs": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/cb-libs"
+    },
+    "cb-marchives": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/marchives"
+    },
+    "cb-telegram": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/telegram"
+    },
+    "cb-wilderness": {
+      "version": "3.0.1",
+      "url": "https://codebytestudios.tebex.store/package/wilderness"
+    }
+  }
+}

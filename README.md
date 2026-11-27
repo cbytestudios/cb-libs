@@ -6,6 +6,21 @@ Provider selection is automatic for known frameworks. Custom integrations use th
 
 Release candidate limitations: live framework and gameplay tests remain outstanding. RedEM/TPZ native camp storage is available with the pinned upstream inventory compatibility patch (see install/native-storage/README.md in cb-libs). It retains native weapon IDs, unique item IDs and metadata. Unpatched servers retain the restricted managed fallback; withdraw fallback contents before switching. Live testing remains required. Do not publish as fully compatible before tests pass.
 
+## Startup and version checks
+
+Every current Codebyte resource loads `@cb-libs/imports/startup.lua` last on the server. It prints one banner using the resource's manifest version, while cb-libs checks every registered resource against the public `versions.json` catalog with a single GitHub request. Update-check failures never block startup.
+
+Available server convars:
+
+```cfg
+set cb-libs:checkUpdates 1
+set cb-libs:versionDebug 0
+set cb-libs:versionCacheSeconds 3600
+# set cb-libs:versionUrl https://raw.githubusercontent.com/cbytestudios/cb-libs/main/versions.json
+```
+
+Run `cbversions` from the server console to force a refresh. Release workflows publish manifest versions to the public catalog through the `CB_RELEASE_INDEX_TOKEN` Actions secret. Use a fine-grained token limited to the public `cbytestudios/cb-libs` repository with **Contents: write** permission; the token is never included in a resource download.
+
 ---
 
 ## Previous v1 documentation

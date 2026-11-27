@@ -79,6 +79,22 @@ jobs:
             --title "${{ github.event.repository.name }} $TAG" \
             --generate-notes
 
+      - name: Publish version to public index
+        env:
+          GH_TOKEN: ${{ secrets.CB_RELEASE_INDEX_TOKEN }}
+          RESOURCE: ${{ github.event.repository.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "CB_RELEASE_INDEX_TOKEN is not configured; public version index was not updated."
+            exit 0
+          fi
+          gh api --method POST repos/cbytestudios/cb-libs/dispatches \
+            -f event_type='cb-release' \
+            -f "client_payload[resource]=$RESOURCE" \
+            -f "client_payload[version]=$VERSION"
+
       # -------------------------------------------------------
       # Send custom Discord update
       # Only runs when a NEW release was created

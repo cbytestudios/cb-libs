@@ -7,6 +7,7 @@ local adapters = {
 
 local detected = CBLibsProviders.Detect('framework')
 local framework = CBLibsConfig.framework ~= 'auto' and CBLibsConfig.framework or detected[1]
+local frameworkLabel = framework and CBLibsProviders.Describe('framework', framework) or nil
 local adapter = framework and adapters[framework] or nil
 local prisonAdapter
 
@@ -48,9 +49,12 @@ if not adapter then
     print(('[cb-libs] No framework loaded. Check shared/config.lua.'):format(tostring(framework or 'none')))
 else
     if #detected > 1 then
-        print(('[cb-libs] Multiple frameworks detected (%s); using %s by built-in priority.'):format(table.concat(detected, ', '), framework))
+        print(('[cb-libs] Multiple frameworks detected (%s); using %s by built-in priority.'):format(
+            table.concat(CBLibsProviders.DescribeAll('framework', detected), ', '),
+            frameworkLabel
+        ))
     end
-    print(('[cb-libs] %s framework loaded.'):format(framework))
+    print(('[cb-libs] %s framework loaded.'):format(frameworkLabel))
 end
 
 local function call(method, ...)
@@ -66,13 +70,17 @@ end
 
 local detectedInventory = CBLibsProviders.Detect('inventory')
 local inventoryProvider = CBLibsConfig.inventory ~= 'auto' and CBLibsConfig.inventory or detectedInventory[1]
+local inventoryLabel = inventoryProvider and CBLibsProviders.Describe('inventory', inventoryProvider) or nil
 
 if not inventoryProvider then
     print('[cb-libs] No inventory loaded. Inventory exports will return nil/false.')
 elseif #detectedInventory > 1 then
-    print(('[cb-libs] Multiple inventories detected (%s); using %s by built-in priority.'):format(table.concat(detectedInventory, ', '), inventoryProvider))
+    print(('[cb-libs] Multiple inventories detected (%s); using %s by built-in priority.'):format(
+        table.concat(CBLibsProviders.DescribeAll('inventory', detectedInventory), ', '),
+        inventoryLabel
+    ))
 else
-    print(('[cb-libs] %s inventory loaded.'):format(inventoryProvider))
+    print(('[cb-libs] %s inventory loaded.'):format(inventoryLabel))
 end
 
 local customInventory, customInventoryOwner

@@ -1,0 +1,76 @@
+name: Update Public Version Index
+
+on:
+  repository_dispatch:
+    types:
+      - cb-release
+  workflow_dispatch:
+    inputs:
+      resource:
+        description: Canonical resource name
+        required: true
+        type: string
+      version:
+        description: Released MAJOR.MINOR.PATCH version
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cb-public-version-index
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public catalog
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Validate and update catalog
+        env:
+          DISPATCH_RESOURCE: ${{ github.event.client_payload.resource }}
+          DISPATCH_VERSION: ${{ github.event.client_payload.version }}
+          INPUT_RESOURCE: ${{ inputs.resource }}
+          INPUT_VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESOURCE="${DISPATCH_RESOURCE:-$INPUT_RESOURCE}"
+          VERSION="${DISPATCH_VERSION:-$INPUT_VERSION}"
+
+          if [[ ! "$RESOURCE" =~ ^cb-[a-z0-9-]+$ ]]; then
+            echo "Invalid resource name: $RESOURCE"
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version: $VERSION"
+            exit 1
+          fi
+          if ! jq -e --arg resource "$RESOURCE" '.resources[$resource]' versions.json >/dev/null; then
+            echo "Resource is not registered in versions.json: $RESOURCE"
+            exit 1
+          fi
+
+          jq --arg resource "$RESOURCE" --arg version "$VERSION" \
+            '.resources[$resource].version = $version' versions.json > versions.json.tmp
+          mv versions.json.tmp versions.json
+
+      - name: Commit catalog change
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- versions.json; then
+            echo "Version index is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add versions.json
+          git commit -m "Update public version index"
+          git pull --rebase origin main
+          git push origin HEAD:main
